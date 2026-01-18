@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+:root {
+  --color-safe: #10b981;
+  --color-caution: #f59e0b;
+  --color-avoid: #ef4444;
+  --color-primary: #ec4899;
+  --color-primary-dark: #db2777;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  color: #1f2937;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Safety level badges */
+.badge-safe {
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  color: #065f46;
+  border: 2px solid #10b981;
+}
+
+.badge-caution {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+  border: 2px solid #f59e0b;
+}
+
+.badge-avoid {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #991b1b;
+  border: 2px solid #ef4444;
+}
+
+/* Card styles */
+.result-card-safe {
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border-left: 4px solid #10b981;
+}
+
+.result-card-caution {
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  border-left: 4px solid #f59e0b;
+}
+
+.result-card-avoid {
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  border-left: 4px solid #ef4444;
+}
+
+/* Loading animation */
+@keyframes pulse-gentle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-pulse-gentle {
+  animation: pulse-gentle 2s ease-in-out infinite;
+}
+
+/* Slide up animation */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out forwards;
+}
+
+/* Thinking dots */
+@keyframes bounce-dots {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-8px); }
+}
+
+.thinking-dot {
+  animation: bounce-dots 1.4s ease-in-out infinite;
+}
+
+.thinking-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.thinking-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
