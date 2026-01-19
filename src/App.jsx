@@ -4,7 +4,7 @@ import { SearchInput } from './components/SearchInput'
 import { ImageUpload } from './components/ImageUpload'
 import { ResultCard } from './components/ResultCard'
 import { checkSafety } from './lib/api'
-import { ForestSpirit, Seedling, CloudPuff, TinyLeaf, SootSprite, Acorn, MiniSoot, Mushroom } from './components/GhibliIcons'
+import { Seedling, CloudPuff, TinyLeaf, SootSprite, Acorn, MiniSoot, Mushroom } from './components/GhibliIcons'
 
 function App() {
   const [query, setQuery] = useState('')
@@ -93,9 +93,9 @@ function App() {
           <div className="ghibli-card p-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                {/* Totoro-like mascot */}
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#d4e2d4] to-[#94b49f] flex items-center justify-center shadow-lg border-2 border-[#6b9b7a]/20">
-                  <ForestSpirit className="w-14 h-14" />
+                {/* Soot sprite mascot */}
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#d4e2d4] to-[#94b49f] flex items-center justify-center shadow-lg border-2 border-[#6b9b7a]/20">
+                  <SootSprite className="w-10 h-10" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-[#4a5a4a]">Pregnancy Safe</h1>
