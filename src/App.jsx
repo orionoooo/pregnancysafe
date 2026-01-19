@@ -4,6 +4,37 @@ import { SearchInput } from './components/SearchInput'
 import { ImageUpload } from './components/ImageUpload'
 import { ResultCard } from './components/ResultCard'
 import { checkSafety } from './lib/api'
+import { CherryBlossom, Seedling, CloudPuff, TinyLeaf, FallingLeaf } from './components/GhibliIcons'
+
+// Larger version for error state
+function FallingLeafLarge({ className }) {
+  return (
+    <svg viewBox="0 0 32 32" className={className} fill="none">
+      <path
+        d="M8 6c8 2 14 10 16 18-4-2-10-2-14-6-2-4-4-8-2-12z"
+        fill="currentColor"
+        fillOpacity="0.2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M10 10c4 4 8 8 12 12"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
+        opacity="0.6"
+      />
+      <path
+        d="M24 24c2 2 3 4 2 6"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
 
 function App() {
   const [query, setQuery] = useState('')
@@ -65,9 +96,15 @@ function App() {
   return (
     <div className="min-h-screen pb-8 relative overflow-hidden">
       {/* Decorative clouds */}
-      <div className="ghibli-cloud fixed top-20 left-10 animate-float" style={{ animationDelay: '0s' }} />
-      <div className="ghibli-cloud fixed top-40 right-20 animate-float" style={{ animationDelay: '2s' }} />
-      <div className="ghibli-cloud fixed bottom-40 left-1/4 animate-float" style={{ animationDelay: '4s' }} />
+      <div className="fixed top-16 left-8 animate-float opacity-50 pointer-events-none" style={{ animationDelay: '0s' }}>
+        <CloudPuff className="w-24 h-14" />
+      </div>
+      <div className="fixed top-32 right-12 animate-float opacity-40 pointer-events-none" style={{ animationDelay: '2s' }}>
+        <CloudPuff className="w-20 h-12" />
+      </div>
+      <div className="fixed bottom-32 left-1/4 animate-float opacity-30 pointer-events-none" style={{ animationDelay: '4s' }}>
+        <CloudPuff className="w-28 h-16" />
+      </div>
 
       {/* Header */}
       <header className="relative z-10 pt-6 pb-4">
@@ -77,7 +114,7 @@ function App() {
               <div className="flex items-center gap-4">
                 {/* Cute icon */}
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#f5d5d8] to-[#e8b4b8] flex items-center justify-center shadow-md">
-                  <span className="text-3xl">🌸</span>
+                  <CherryBlossom className="w-10 h-10" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-[#5a4a3a]">Pregnancy Safe</h1>
@@ -152,7 +189,9 @@ function App() {
         {/* Error state */}
         {error && (
           <div className="ghibli-card p-6 text-center animate-slide-up border-2 border-[#d4847a]/30">
-            <div className="text-4xl mb-3">🍂</div>
+            <div className="flex justify-center mb-3">
+              <FallingLeafLarge className="w-12 h-12 text-[#d4847a]" />
+            </div>
             <p className="text-[#8a4a42] font-medium">{error}</p>
             <button
               onClick={clearResults}
@@ -180,7 +219,9 @@ function App() {
         {/* Empty state */}
         {!result && !loading && !error && (
           <div className="text-center py-8 animate-slide-up">
-            <div className="text-6xl mb-4 animate-float">🌿</div>
+            <div className="flex justify-center mb-4 animate-float">
+              <Seedling className="w-16 h-16" />
+            </div>
             <h2 className="text-xl font-bold text-[#5a4a3a] mb-2">
               What would you like to check?
             </h2>
@@ -210,10 +251,10 @@ function App() {
 
       {/* Footer */}
       <footer className="max-w-2xl mx-auto px-4 mt-12 text-center relative z-10">
-        <div className="flex justify-center gap-2 mb-3 opacity-40">
-          <span>🌸</span>
-          <span>🌿</span>
-          <span>🌸</span>
+        <div className="flex justify-center items-center gap-3 mb-3 opacity-50">
+          <TinyLeaf className="w-4 h-4" />
+          <CherryBlossom className="w-6 h-6" />
+          <TinyLeaf className="w-4 h-4" />
         </div>
         <p className="text-xs text-[#8b7355]/70">
           This tool provides general information based on scientific research.
