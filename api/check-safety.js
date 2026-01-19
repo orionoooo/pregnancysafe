@@ -1,9 +1,4 @@
 // Vercel serverless function for Claude API integration
-import Anthropic from '@anthropic-ai/sdk'
-
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
 
 const SYSTEM_PROMPT = `You are a pregnancy safety expert assistant. When asked about foods, activities, medications, or skincare ingredients, provide evidence-based information about their safety during pregnancy.
 
@@ -34,8 +29,24 @@ If analyzing an image of a menu or ingredient list, identify items and provide s
 Always be helpful and non-judgmental. Many "rules" about pregnancy are overly cautious - provide the actual evidence.`
 
 export default async function handler(req, res) {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end()
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  const apiKey = process.env.ANTHROPIC_API_KEY
+
+  if (!apiKey) {
+    console.error('ANTHROPIC_API_KEY not configured')
+    return res.status(500).json({ error: 'API key not configured' })
   }
 
   const { query, image, trimester, databaseHint } = req.body
@@ -45,9 +56,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const messages = []
-
-    // Build the user message
+    // Build the user message content
     let userContent = []
 
     if (image) {
@@ -81,20 +90,35 @@ export default async function handler(req, res) {
       text: textPrompt + '\n\nRespond with a JSON object as specified in your instructions.'
     })
 
-    messages.push({
-      role: 'user',
-      content: userContent,
+    // Call Claude API directly with fetch
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1500,
+        system: SYSTEM_PROMPT,
+        messages: [{
+          role: 'user',
+          content: userContent
+        }]
+      })
     })
 
-    const response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1500,
-      system: SYSTEM_PROMPT,
-      messages,
-    })
+    if (!response.ok) {
+      const errorData = await response.text()
+      console.error('Claude API error:', response.status, errorData)
+      throw new Error(`Claude API error: ${response.status}`)
+    }
+
+    const data = await response.json()
 
     // Extract the text response
-    const textContent = response.content.find(c => c.type === 'text')
+    const textContent = data.content?.find(c => c.type === 'text')
     if (!textContent) {
       throw new Error('No text response from Claude')
     }
