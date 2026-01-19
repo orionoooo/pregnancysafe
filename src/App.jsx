@@ -11,7 +11,7 @@ function App() {
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const [trimester, setTrimester] = useState(null) // 1, 2, 3, or null for general
+  const [trimester, setTrimester] = useState(null)
 
   const handleSearch = async (searchQuery) => {
     if (!searchQuery.trim() && !image) return
@@ -36,7 +36,6 @@ function App() {
 
   const handleImageSelect = async (imageData) => {
     setImage(imageData)
-    // Auto-search when image is uploaded
     if (imageData) {
       setLoading(true)
       setError(null)
@@ -64,48 +63,58 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen pb-8">
+    <div className="min-h-screen pb-8 relative overflow-hidden">
+      {/* Decorative clouds */}
+      <div className="ghibli-cloud fixed top-20 left-10 animate-float" style={{ animationDelay: '0s' }} />
+      <div className="ghibli-cloud fixed top-40 right-20 animate-float" style={{ animationDelay: '2s' }} />
+      <div className="ghibli-cloud fixed bottom-40 left-1/4 animate-float" style={{ animationDelay: '4s' }} />
+
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-xl shadow-sm sticky top-0 z-10 border-b border-pink-100">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">🤰</span>
-              <div>
-                <h1 className="text-xl font-bold text-gray-800">Pregnancy Safe</h1>
-                <p className="text-sm text-gray-500">Quick safety checker</p>
+      <header className="relative z-10 pt-6 pb-4">
+        <div className="max-w-2xl mx-auto px-4">
+          <div className="ghibli-card p-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                {/* Cute icon */}
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#f5d5d8] to-[#e8b4b8] flex items-center justify-center shadow-md">
+                  <span className="text-3xl">🌸</span>
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-[#5a4a3a]">Pregnancy Safe</h1>
+                  <p className="text-sm text-[#8b7355]">Your gentle guide to safety</p>
+                </div>
+              </div>
+
+              {/* Trimester selector */}
+              <div className="flex gap-2">
+                {[1, 2, 3].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setTrimester(trimester === t ? null : t)}
+                    className={`w-10 h-10 rounded-full text-sm font-bold transition-all duration-300 ${
+                      trimester === t
+                        ? 'bg-gradient-to-br from-[#e8b4b8] to-[#d9a5a9] text-white shadow-md scale-110'
+                        : 'bg-white/80 text-[#8b7355] hover:bg-[#f5d5d8]/50 border border-[#e8b4b8]/30'
+                    }`}
+                  >
+                    T{t}
+                  </button>
+                ))}
               </div>
             </div>
-
-            {/* Trimester selector */}
-            <div className="flex gap-1">
-              {[1, 2, 3].map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setTrimester(trimester === t ? null : t)}
-                  className={`px-3 py-1 rounded-full text-sm font-medium transition-all ${
-                    trimester === t
-                      ? 'bg-pink-500 text-white'
-                      : 'bg-pink-100 text-pink-600 hover:bg-pink-200'
-                  }`}
-                >
-                  T{t}
-                </button>
-              ))}
-            </div>
+            {trimester && (
+              <p className="text-sm text-[#8b7355] mt-3 text-center bg-[#f5d5d8]/30 py-2 rounded-xl">
+                Showing results for Trimester {trimester}
+              </p>
+            )}
           </div>
-          {trimester && (
-            <p className="text-sm text-pink-600 mt-2 text-center">
-              Showing results for Trimester {trimester}
-            </p>
-          )}
         </div>
       </header>
 
       {/* Main content */}
-      <main className="max-w-2xl mx-auto px-4 pt-6 space-y-6">
+      <main className="max-w-2xl mx-auto px-4 pt-4 space-y-6 relative z-10">
         {/* Search section */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4">
+        <div className="ghibli-card p-6 space-y-5">
           <SearchInput
             value={query}
             onChange={setQuery}
@@ -115,9 +124,9 @@ function App() {
           />
 
           <div className="flex items-center gap-4">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-gray-400 text-sm">or</span>
-            <div className="flex-1 h-px bg-gray-200" />
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#e8b4b8]/40 to-transparent" />
+            <span className="text-[#8b7355]/60 text-sm font-medium">or</span>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#e8b4b8]/40 to-transparent" />
           </div>
 
           <ImageUpload
@@ -129,24 +138,25 @@ function App() {
 
         {/* Loading state */}
         {loading && (
-          <div className="bg-white rounded-2xl shadow-lg p-8 text-center animate-slide-up">
-            <div className="flex justify-center gap-2 mb-4">
-              <div className="w-3 h-3 bg-pink-400 rounded-full thinking-dot" />
-              <div className="w-3 h-3 bg-pink-400 rounded-full thinking-dot" />
-              <div className="w-3 h-3 bg-pink-400 rounded-full thinking-dot" />
+          <div className="ghibli-card p-8 text-center animate-slide-up">
+            <div className="flex justify-center gap-3 mb-4">
+              <div className="w-3 h-3 rounded-full thinking-dot" />
+              <div className="w-3 h-3 rounded-full thinking-dot" />
+              <div className="w-3 h-3 rounded-full thinking-dot" />
             </div>
-            <p className="text-gray-600">Analyzing safety information...</p>
-            <p className="text-sm text-gray-400 mt-1">Checking scientific data & research</p>
+            <p className="text-[#5a4a3a] font-medium">Looking up safety information...</p>
+            <p className="text-sm text-[#8b7355] mt-1">Checking trusted sources</p>
           </div>
         )}
 
         {/* Error state */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center animate-slide-up">
-            <p className="text-red-600 font-medium">{error}</p>
+          <div className="ghibli-card p-6 text-center animate-slide-up border-2 border-[#d4847a]/30">
+            <div className="text-4xl mb-3">🍂</div>
+            <p className="text-[#8a4a42] font-medium">{error}</p>
             <button
               onClick={clearResults}
-              className="mt-4 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+              className="mt-4 px-6 py-2 ghibli-button-secondary"
             >
               Try Again
             </button>
@@ -160,7 +170,7 @@ function App() {
 
             <button
               onClick={clearResults}
-              className="w-full py-3 bg-white rounded-xl text-gray-600 hover:bg-gray-50 transition-colors border border-gray-200"
+              className="w-full py-4 ghibli-button-secondary rounded-2xl"
             >
               Check Something Else
             </button>
@@ -170,25 +180,25 @@ function App() {
         {/* Empty state */}
         {!result && !loading && !error && (
           <div className="text-center py-8 animate-slide-up">
-            <div className="text-5xl mb-4">🔍</div>
-            <h2 className="text-xl font-semibold text-gray-700 mb-2">
+            <div className="text-6xl mb-4 animate-float">🌿</div>
+            <h2 className="text-xl font-bold text-[#5a4a3a] mb-2">
               What would you like to check?
             </h2>
-            <p className="text-gray-500 max-w-md mx-auto">
+            <p className="text-[#8b7355] max-w-md mx-auto">
               Type a food, medication, skincare ingredient, or activity.
               Or take a photo of a menu or ingredient list.
             </p>
 
             {/* Quick examples */}
-            <div className="mt-6 flex flex-wrap justify-center gap-2">
-              {['sushi', 'hot springs', 'retinol', 'caffeine', 'deli meat'].map((example) => (
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              {['sushi', 'coffee', 'retinol', 'hot tub', 'tylenol'].map((example) => (
                 <button
                   key={example}
                   onClick={() => {
                     setQuery(example)
                     handleSearch(example)
                   }}
-                  className="px-4 py-2 bg-white rounded-full text-gray-600 hover:bg-pink-50 hover:text-pink-600 transition-colors border border-gray-200 text-sm"
+                  className="px-5 py-2.5 ghibli-button-secondary rounded-full text-sm"
                 >
                   {example}
                 </button>
@@ -198,11 +208,16 @@ function App() {
         )}
       </main>
 
-      {/* Footer disclaimer */}
-      <footer className="max-w-2xl mx-auto px-4 mt-12 text-center">
-        <p className="text-xs text-gray-400">
+      {/* Footer */}
+      <footer className="max-w-2xl mx-auto px-4 mt-12 text-center relative z-10">
+        <div className="flex justify-center gap-2 mb-3 opacity-40">
+          <span>🌸</span>
+          <span>🌿</span>
+          <span>🌸</span>
+        </div>
+        <p className="text-xs text-[#8b7355]/70">
           This tool provides general information based on scientific research.
-          Always consult your healthcare provider for personalized medical advice.
+          Always consult your healthcare provider for personalized advice.
         </p>
       </footer>
     </div>

@@ -15,51 +15,52 @@ export function ResultCard({ result, trimester }) {
       badge: 'Generally Safe',
       badgeClass: 'badge-safe',
       cardClass: 'result-card-safe',
-      icon: '✓',
-      color: 'text-emerald-700'
+      icon: '🌿',
+      headerColor: 'text-[#4a6b47]'
     },
     caution: {
       badge: 'Use Caution',
       badgeClass: 'badge-caution',
       cardClass: 'result-card-caution',
-      icon: '⚠',
-      color: 'text-amber-700'
+      icon: '🍂',
+      headerColor: 'text-[#7a6030]'
     },
     avoid: {
       badge: 'Best to Avoid',
       badgeClass: 'badge-avoid',
       cardClass: 'result-card-avoid',
-      icon: '✗',
-      color: 'text-red-700'
+      icon: '🥀',
+      headerColor: 'text-[#8a4a42]'
     }
   }
 
   const config = safetyConfig[safetyLevel] || safetyConfig.caution
 
   return (
-    <div className={`rounded-2xl p-6 ${config.cardClass} space-y-5`}>
+    <div className={`rounded-3xl p-6 ${config.cardClass} space-y-5`}>
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">{item}</h2>
-          <p className="text-gray-600 mt-1">{summary}</p>
+          <h2 className={`text-2xl font-bold ${config.headerColor}`}>{item}</h2>
+          <p className="text-[#5a4a3a] mt-2 leading-relaxed">{summary}</p>
         </div>
-        <span className={`px-4 py-2 rounded-full font-semibold text-sm whitespace-nowrap ${config.badgeClass}`}>
-          {config.icon} {config.badge}
+        <span className={`px-4 py-2 rounded-2xl font-semibold text-sm whitespace-nowrap flex items-center gap-2 ${config.badgeClass}`}>
+          <span>{config.icon}</span>
+          <span>{config.badge}</span>
         </span>
       </div>
 
       {/* Direct risks to baby */}
       {directRisks && directRisks.length > 0 && (
-        <div className="bg-white/60 rounded-xl p-4">
-          <h3 className="font-semibold text-red-700 flex items-center gap-2 mb-2">
-            <span className="text-lg">👶</span>
+        <div className="bg-white/50 rounded-2xl p-5 border border-[#d4847a]/20">
+          <h3 className="font-bold text-[#8a4a42] flex items-center gap-2 mb-3">
+            <span className="text-xl">👶</span>
             Direct Risks to Baby
           </h3>
           <ul className="space-y-2">
             {directRisks.map((risk, i) => (
-              <li key={i} className="flex items-start gap-2 text-gray-700">
-                <span className="text-red-500 mt-1">•</span>
+              <li key={i} className="flex items-start gap-3 text-[#5a4a3a]">
+                <span className="text-[#d4847a] mt-0.5">●</span>
                 <span>{risk}</span>
               </li>
             ))}
@@ -67,17 +68,17 @@ export function ResultCard({ result, trimester }) {
         </div>
       )}
 
-      {/* General risks (not pregnancy-specific) */}
+      {/* General risks */}
       {generalRisks && generalRisks.length > 0 && (
-        <div className="bg-white/40 rounded-xl p-4">
-          <h3 className="font-semibold text-gray-600 flex items-center gap-2 mb-2">
-            <span className="text-lg">ℹ️</span>
+        <div className="bg-white/40 rounded-2xl p-5 border border-[#8b7355]/10">
+          <h3 className="font-bold text-[#8b7355] flex items-center gap-2 mb-3">
+            <span className="text-xl">ℹ️</span>
             General Risks (applies to everyone)
           </h3>
           <ul className="space-y-2">
             {generalRisks.map((risk, i) => (
-              <li key={i} className="flex items-start gap-2 text-gray-600">
-                <span className="text-gray-400 mt-1">•</span>
+              <li key={i} className="flex items-start gap-3 text-[#5a4a3a]/80">
+                <span className="text-[#8b7355]/60 mt-0.5">●</span>
                 <span>{risk}</span>
               </li>
             ))}
@@ -85,25 +86,31 @@ export function ResultCard({ result, trimester }) {
         </div>
       )}
 
-      {/* Trimester-specific notes */}
+      {/* Trimester notes */}
       {trimesterNotes && (
-        <div className="bg-white/50 rounded-xl p-4">
-          <h3 className="font-semibold text-purple-700 flex items-center gap-2 mb-2">
-            <span className="text-lg">📅</span>
-            {trimester ? `Trimester ${trimester} Specific` : 'By Trimester'}
+        <div className="bg-white/40 rounded-2xl p-5 border border-[#b5d4e8]/30">
+          <h3 className="font-bold text-[#5a7a9a] flex items-center gap-2 mb-3">
+            <span className="text-xl">📅</span>
+            {trimester ? `Trimester ${trimester} Notes` : 'By Trimester'}
           </h3>
           {typeof trimesterNotes === 'string' ? (
-            <p className="text-gray-700">{trimesterNotes}</p>
+            <p className="text-[#5a4a3a]">{trimesterNotes}</p>
           ) : (
             <div className="space-y-2">
               {trimesterNotes.t1 && (
-                <p className="text-gray-700"><strong>1st:</strong> {trimesterNotes.t1}</p>
+                <p className="text-[#5a4a3a]">
+                  <span className="font-semibold text-[#e8b4b8]">1st:</span> {trimesterNotes.t1}
+                </p>
               )}
               {trimesterNotes.t2 && (
-                <p className="text-gray-700"><strong>2nd:</strong> {trimesterNotes.t2}</p>
+                <p className="text-[#5a4a3a]">
+                  <span className="font-semibold text-[#a8c5a0]">2nd:</span> {trimesterNotes.t2}
+                </p>
               )}
               {trimesterNotes.t3 && (
-                <p className="text-gray-700"><strong>3rd:</strong> {trimesterNotes.t3}</p>
+                <p className="text-[#5a4a3a]">
+                  <span className="font-semibold text-[#b5d4e8]">3rd:</span> {trimesterNotes.t3}
+                </p>
               )}
             </div>
           )}
@@ -112,15 +119,15 @@ export function ResultCard({ result, trimester }) {
 
       {/* Recommendations */}
       {recommendations && recommendations.length > 0 && (
-        <div className="bg-white/50 rounded-xl p-4">
-          <h3 className="font-semibold text-emerald-700 flex items-center gap-2 mb-2">
-            <span className="text-lg">💡</span>
+        <div className="bg-white/50 rounded-2xl p-5 border border-[#a8c5a0]/30">
+          <h3 className="font-bold text-[#4a6b47] flex items-center gap-2 mb-3">
+            <span className="text-xl">💡</span>
             Recommendations
           </h3>
           <ul className="space-y-2">
             {recommendations.map((rec, i) => (
-              <li key={i} className="flex items-start gap-2 text-gray-700">
-                <span className="text-emerald-500 mt-1">→</span>
+              <li key={i} className="flex items-start gap-3 text-[#5a4a3a]">
+                <span className="text-[#7fb685] mt-0.5">→</span>
                 <span>{rec}</span>
               </li>
             ))}
@@ -130,9 +137,9 @@ export function ResultCard({ result, trimester }) {
 
       {/* Sources */}
       {sources && sources.length > 0 && (
-        <div className="pt-4 border-t border-gray-200/50">
-          <p className="text-xs text-gray-500">
-            <strong>Sources:</strong> {sources.join(', ')}
+        <div className="pt-4 border-t border-[#8b7355]/10">
+          <p className="text-xs text-[#8b7355]/70">
+            <span className="font-semibold">Sources:</span> {sources.join(', ')}
           </p>
         </div>
       )}
