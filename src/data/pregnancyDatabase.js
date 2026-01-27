@@ -408,6 +408,31 @@ export const pregnancyDatabase = {
     sources: ['ACOG', 'AAP', 'LEAP Study']
   },
 
+  'blue pea flower': {
+    item: 'Blue Pea Flower / Butterfly Pea Flower',
+    safetyLevel: 'caution',
+    summary: 'Limited research on butterfly pea flower during pregnancy. Best to avoid or use sparingly.',
+    directRisks: [
+      'May have uterine stimulant properties - not well studied',
+      'Some traditional medicine sources advise avoiding during pregnancy'
+    ],
+    generalRisks: [
+      'Limited scientific research available'
+    ],
+    recommendations: [
+      'Avoid during first trimester to be safe',
+      'If consuming, limit to occasional small amounts',
+      'Skip butterfly pea tea/drinks during pregnancy',
+      'Consult your healthcare provider if you want to use it'
+    ],
+    trimesterNotes: {
+      t1: 'Best to avoid - uterine stimulant concerns',
+      t2: 'Use with caution if at all',
+      t3: 'May stimulate uterus - best to avoid'
+    },
+    sources: ['Traditional medicine guidelines', 'MotherToBaby - consult provider for herbs']
+  },
+
   'shellfish': {
     item: 'Shellfish / Shrimp / Crab / Lobster',
     safetyLevel: 'safe',
@@ -584,6 +609,22 @@ export const pregnancyDatabase = {
     ],
     trimesterNotes: 'Avoid throughout pregnancy.',
     sources: ['ACOG', 'American Beverage Association']
+  },
+
+  'apple': {
+    item: 'Apple',
+    safetyLevel: 'safe',
+    summary: 'Apples are safe and nutritious during pregnancy! They provide fiber, vitamins, and antioxidants.',
+    directRisks: [],
+    generalRisks: [],
+    recommendations: [
+      'Wash thoroughly before eating to remove pesticides',
+      'Great source of fiber which helps with pregnancy constipation',
+      'Contains vitamin C and potassium',
+      'Organic is preferable but conventional is also safe when washed'
+    ],
+    trimesterNotes: 'Safe throughout pregnancy - a great healthy snack!',
+    sources: ['ACOG', 'American Pregnancy Association']
   },
 
   'pineapple': {
@@ -1275,17 +1316,34 @@ export function findInDatabase(query) {
     return pregnancyDatabase[normalizedQuery]
   }
 
-  // Check for partial matches in keys
+  // Check for exact word matches in keys (avoid "apple" matching "pineapple")
   for (const key of Object.keys(pregnancyDatabase)) {
-    if (key.includes(normalizedQuery) || normalizedQuery.includes(key)) {
+    // Only match if query equals key, or query contains key as a whole word
+    if (key === normalizedQuery) {
+      return pregnancyDatabase[key]
+    }
+    // Check if the query contains the key as a complete word (with word boundaries)
+    const keyWords = key.split(' ')
+    const queryWords = normalizedQuery.split(' ')
+    // Only match if words are exact or differ by just 1-2 chars (for plurals like "peanut" vs "peanuts")
+    const isCloseMatch = (a, b) => {
+      if (a === b) return true
+      // Allow plural forms (differ by 1-2 chars at end)
+      if (a.startsWith(b) && a.length - b.length <= 2) return true
+      if (b.startsWith(a) && b.length - a.length <= 2) return true
+      return false
+    }
+    if (keyWords.every(kw => queryWords.some(qw => isCloseMatch(kw, qw)))) {
       return pregnancyDatabase[key]
     }
   }
 
-  // Check for matches in item names
+  // Check for matches in item names - be more strict
   for (const entry of Object.values(pregnancyDatabase)) {
     const itemLower = entry.item.toLowerCase()
-    if (itemLower.includes(normalizedQuery) || normalizedQuery.includes(itemLower.split('/')[0].trim())) {
+    const itemFirstPart = itemLower.split('/')[0].trim()
+    // Exact match on first part of item name
+    if (itemFirstPart === normalizedQuery || normalizedQuery === itemLower) {
       return entry
     }
   }
@@ -1569,16 +1627,27 @@ export function findInDatabase(query) {
     'spicy': 'spicy food',
     'hot sauce': 'spicy food',
     'jalapeno': 'spicy food',
-    'sriracha': 'spicy food'
+    'sriracha': 'spicy food',
+
+    // Blue pea flower
+    'butterfly pea': 'blue pea flower',
+    'butterfly pea flower': 'blue pea flower',
+    'clitoria ternatea': 'blue pea flower',
+    'asian pigeonwings': 'blue pea flower',
+    'blue tea': 'blue pea flower'
   }
 
   if (aliases[normalizedQuery]) {
     return pregnancyDatabase[aliases[normalizedQuery]]
   }
 
-  // Check aliases for partial matches
+  // Check aliases for partial matches - but only if the match is a complete word
   for (const [alias, key] of Object.entries(aliases)) {
-    if (normalizedQuery.includes(alias) || alias.includes(normalizedQuery)) {
+    // Check if query contains alias as a complete word (not just substring)
+    const queryWords = normalizedQuery.split(/\s+/)
+    const aliasWords = alias.split(/\s+/)
+    // Match if all alias words appear as complete words in query
+    if (aliasWords.every(aw => queryWords.some(qw => qw === aw || qw === aw + 's' || qw + 's' === aw))) {
       return pregnancyDatabase[key]
     }
   }
