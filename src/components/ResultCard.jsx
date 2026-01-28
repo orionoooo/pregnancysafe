@@ -1,6 +1,31 @@
 import { LeafSprig, FallingLeaf, WiltedFlower } from './GhibliIcons'
 
 export function ResultCard({ result, trimester }) {
+  // Handle case where result might be a string (JSON)
+  let parsedResult = result
+  if (typeof result === 'string') {
+    try {
+      parsedResult = JSON.parse(result)
+    } catch (e) {
+      // If it's not valid JSON, show as-is
+      return (
+        <div className="ghibli-card p-5">
+          <p className="text-[#5a5a5a]">{result}</p>
+        </div>
+      )
+    }
+  }
+
+  // Handle menu analysis with multiple items
+  if (parsedResult.menuAnalysis && parsedResult.items) {
+    return <MenuResultCard result={parsedResult} />
+  }
+
+  // Also check if items array exists without menuAnalysis flag
+  if (parsedResult.items && Array.isArray(parsedResult.items)) {
+    return <MenuResultCard result={{ ...parsedResult, menuAnalysis: true }} />
+  }
+
   const {
     item,
     safetyLevel,
@@ -10,7 +35,7 @@ export function ResultCard({ result, trimester }) {
     recommendations,
     trimesterNotes,
     sources
-  } = result
+  } = parsedResult
 
   const safetyConfig = {
     safe: {
@@ -142,10 +167,28 @@ export function ResultCard({ result, trimester }) {
       {sources && sources.length > 0 && (
         <div className="pt-4 border-t border-[#94b49f]/20">
           <p className="text-xs text-[#6b7b6b]/70">
-            <span className="font-semibold">Sources:</span> {sources.join(', ')}
+            <span className="font-semibold">Sources:</span>{' '}
+            {sources.map((source, i) => (
+              <span key={i}>
+                {i > 0 && ', '}
+                {source.startsWith('http') ? (
+                  <a
+                    href={source}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#4a7c59] underline hover:text-[#3d5c47]"
+                  >
+                    {new URL(source).hostname.replace('www.', '')}
+                  </a>
+                ) : (
+                  <span>{source}</span>
+                )}
+              </span>
+            ))}
           </p>
         </div>
       )}
+
     </div>
   )
 }
@@ -192,5 +235,114 @@ function LightbulbIcon({ className }) {
       <path d="M9 21h6M12 3a6 6 0 016 6c0 2.5-1.5 4-3 5.5V17a1 1 0 01-1 1h-4a1 1 0 01-1-1v-2.5C7.5 13 6 11.5 6 9a6 6 0 016-6z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M9 14h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
+  )
+}
+
+// Menu/Ingredient analysis card for multiple items
+function MenuResultCard({ result }) {
+  const { items, overallAdvice, analysisType } = result
+
+  // Determine header based on analysis type
+  const getHeader = () => {
+    switch (analysisType) {
+      case 'ingredients':
+        return { title: 'Ingredient Analysis', subtitle: 'ingredients identified' }
+      case 'product':
+        return { title: 'Product Analysis', subtitle: 'ingredients checked' }
+      case 'menu':
+      default:
+        return { title: 'Menu Analysis', subtitle: 'items analyzed' }
+    }
+  }
+
+  const header = getHeader()
+
+  const getSafetyStyle = (level) => {
+    switch (level) {
+      case 'safe':
+        return { bg: 'bg-[#d4e8d4]', text: 'text-[#3d5c47]', border: 'border-[#94b49f]', icon: '✓' }
+      case 'caution':
+        return { bg: 'bg-[#f5e6d3]', text: 'text-[#6b5a30]', border: 'border-[#d4b896]', icon: '⚠' }
+      case 'avoid':
+        return { bg: 'bg-[#f5d4d4]', text: 'text-[#7a4a42]', border: 'border-[#d4a5a5]', icon: '✗' }
+      default:
+        return { bg: 'bg-gray-100', text: 'text-gray-600', border: 'border-gray-300', icon: '?' }
+    }
+  }
+
+  // Group items by safety level
+  const safeItems = items?.filter(i => i.safetyLevel === 'safe') || []
+  const cautionItems = items?.filter(i => i.safetyLevel === 'caution') || []
+  const avoidItems = items?.filter(i => i.safetyLevel === 'avoid') || []
+
+  return (
+    <div className="space-y-4">
+      <div className="ghibli-card p-5">
+        <h2 className="text-xl font-bold text-[#4a5a4a] mb-2">{header.title}</h2>
+        <p className="text-[#6b7b6b] text-sm">{items?.length || 0} {header.subtitle}</p>
+      </div>
+
+      {/* Avoid items first (most important) */}
+      {avoidItems.length > 0 && (
+        <div className="rounded-2xl p-5 bg-[#fdf2f2] border-2 border-[#e8b4b4]">
+          <h3 className="font-bold text-[#7a4a42] mb-3 flex items-center gap-2">
+            <WiltedFlower className="w-5 h-5" />
+            Best to Avoid ({avoidItems.length})
+          </h3>
+          <div className="space-y-3">
+            {avoidItems.map((item, i) => (
+              <div key={i} className="bg-white/60 rounded-xl p-3">
+                <div className="font-semibold text-[#7a4a42]">{item.item}</div>
+                <p className="text-sm text-[#5a4a4a] mt-1">{item.summary}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Caution items */}
+      {cautionItems.length > 0 && (
+        <div className="rounded-2xl p-5 bg-[#fdf8f2] border-2 border-[#e8d4b4]">
+          <h3 className="font-bold text-[#6b5a30] mb-3 flex items-center gap-2">
+            <FallingLeaf className="w-5 h-5" />
+            Use Caution ({cautionItems.length})
+          </h3>
+          <div className="space-y-3">
+            {cautionItems.map((item, i) => (
+              <div key={i} className="bg-white/60 rounded-xl p-3">
+                <div className="font-semibold text-[#6b5a30]">{item.item}</div>
+                <p className="text-sm text-[#5a4a4a] mt-1">{item.summary}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Safe items */}
+      {safeItems.length > 0 && (
+        <div className="rounded-2xl p-5 bg-[#f2fdf4] border-2 border-[#b4e8be]">
+          <h3 className="font-bold text-[#3d5c47] mb-3 flex items-center gap-2">
+            <LeafSprig className="w-5 h-5" />
+            Generally Safe ({safeItems.length})
+          </h3>
+          <div className="space-y-3">
+            {safeItems.map((item, i) => (
+              <div key={i} className="bg-white/60 rounded-xl p-3">
+                <div className="font-semibold text-[#3d5c47]">{item.item}</div>
+                <p className="text-sm text-[#5a4a4a] mt-1">{item.summary}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Overall advice */}
+      {overallAdvice && (
+        <div className="ghibli-card p-5">
+          <h3 className="font-bold text-[#4a5a4a] mb-2">Overall Advice</h3>
+          <p className="text-[#5a5a5a]">{overallAdvice}</p>
+        </div>
+      )}
+    </div>
   )
 }

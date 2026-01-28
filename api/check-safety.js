@@ -40,10 +40,20 @@ When analyzing product labels/ingredients, identify ANY concerning ingredients a
 
 RESPONSE FORMAT - ONLY valid JSON, no markdown:
 
+For SINGLE items (one food, activity, or medication):
 {"item":"Name of food/activity/medication","safetyLevel":"safe|caution|avoid","summary":"Brief explanation under 20 words","sources":["https://example.com/source1"]}
 
-For MENUS/IMAGES with multiple items:
-{"menuAnalysis":true,"items":[{"item":"Name","safetyLevel":"safe|caution|avoid","summary":"Brief explanation"}],"overallAdvice":"Brief tip","sources":["https://..."]}
+For MENUS, INGREDIENT LISTS, or IMAGES with multiple items - ALWAYS use this format to show a breakdown of each item:
+{"menuAnalysis":true,"analysisType":"menu|ingredients|product","items":[{"item":"Name","safetyLevel":"safe|caution|avoid","summary":"Brief explanation"}],"overallAdvice":"Brief tip","sources":["https://..."]}
+
+Use analysisType: "menu" for restaurant menus, "ingredients" for food/drink ingredient lists, "product" for skincare/beauty products.
+
+IMPORTANT FOR INGREDIENT LISTS (juice bottles, food packages, skincare products):
+- List EVERY ingredient you can read from the image
+- Even common safe ingredients should be listed (e.g., "Water - safe", "Sugar - safe in moderation")
+- Flag any concerning ingredients with caution/avoid
+- This helps the user verify you read the full ingredient list
+- Group similar safe ingredients if there are many (e.g., "Vitamins B1, B2, B6, B12 - safe and beneficial")
 
 IMPORTANT: Always include a "sources" array with 1-3 relevant URLs (full URLs starting with https://) from reputable sources like:
 - acog.org (American College of OB-GYN)
