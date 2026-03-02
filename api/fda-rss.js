@@ -435,7 +435,7 @@ async function fetchFdaEnforcementReports() {
     const dateFrom = past.toISOString().slice(0, 10).replace(/-/g, '')
     const dateTo = now.toISOString().slice(0, 10).replace(/-/g, '')
 
-    const url = `https://api.fda.gov/food/enforcement.json?search=report_date:[${dateFrom}+TO+${dateTo}]&sort=report_date:desc&limit=30`
+    const url = `https://api.fda.gov/food/enforcement.json?search=report_date:%5B${dateFrom}+TO+${dateTo}%5D&sort=report_date:desc&limit=30`
     console.log('Fetching FDA Enforcement:', url)
 
     const response = await fetch(url, {
