@@ -83,6 +83,14 @@ export default async function handler(req, res) {
       console.error('Enforcement API failed:', e.message)
     }
 
+    // Fetch from recalls.gov API for comprehensive coverage
+    try {
+      const recallsGovData = await fetchRecallsGov()
+      recallsGovData.forEach(r => unique.push(r))
+    } catch (e) {
+      console.error('Recalls.gov API failed:', e.message)
+    }
+
     // Deduplicate again after adding scraped results
     const finalUnique = unique.filter((recall, index, self) =>
       index === self.findIndex(r => {
@@ -509,6 +517,80 @@ async function fetchFdaEnforcementReports() {
     return recalls
   } catch (error) {
     console.error('FDA Enforcement API error:', error)
+    return []
+  }
+}
+
+// Fetch from recalls.gov API
+async function fetchRecallsGov() {
+  try {
+    // Recalls.gov has a JSON API endpoint
+    const response = await fetch('https://www.recalls.gov/recent.json', {
+      headers: {
+        'User-Agent': 'PregnancySafe-App/1.0 (Food Safety Monitor)',
+        'Accept': 'application/json'
+      }
+    })
+
+    if (!response.ok) return []
+
+    const data = await response.json()
+    const recalls = []
+
+    // Filter for FDA food recalls
+    const fdaRecalls = (data.recalls || data || []).filter(r =>
+      r.organization === 'FDA' ||
+      r.agency === 'FDA' ||
+      (r.description && r.description.toLowerCase().includes('food'))
+    )
+
+    for (const recall of fdaRecalls.slice(0, 20)) {
+      const fullText = ((recall.title || '') + ' ' + (recall.description || '')).toLowerCase()
+
+      // Check if food-related
+      const isFoodRelated =
+        fullText.includes('listeria') ||
+        fullText.includes('salmonella') ||
+        fullText.includes('e. coli') ||
+        fullText.includes('food') ||
+        fullText.includes('cheese') ||
+        fullText.includes('fruit') ||
+        fullText.includes('blueberr') ||
+        fullText.includes('frozen') ||
+        fullText.includes('produce') ||
+        fullText.includes('meat') ||
+        fullText.includes('dairy')
+
+      if (!isFoodRelated) continue
+
+      let contaminant = 'Unknown'
+      if (fullText.includes('listeria')) contaminant = 'Listeria'
+      else if (fullText.includes('salmonella')) contaminant = 'Salmonella'
+      else if (fullText.includes('e. coli') || fullText.includes('e.coli')) contaminant = 'E. coli'
+
+      let pregnancyRisk = 'moderate'
+      if (contaminant === 'Listeria') pregnancyRisk = 'high'
+
+      recalls.push({
+        id: 'gov-' + (recall.id || Buffer.from(recall.title || '').toString('base64').substring(0, 15)),
+        title: recall.title || 'Unknown',
+        product: recall.title || '',
+        brand: recall.manufacturer || recall.company || '',
+        description: recall.description || '',
+        link: recall.url || recall.link || '',
+        date: recall.date || 'Recent',
+        rawDate: recall.date ? new Date(recall.date).toISOString() : new Date().toISOString(),
+        contaminant,
+        pregnancyRisk,
+        status: 'Announced',
+        source: 'Recalls.gov'
+      })
+    }
+
+    console.log(`Fetched ${recalls.length} recalls from Recalls.gov`)
+    return recalls
+  } catch (error) {
+    console.error('Recalls.gov API error:', error)
     return []
   }
 }
