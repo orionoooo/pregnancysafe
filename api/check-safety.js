@@ -19,7 +19,16 @@ CRITICAL DISTINCTION - Focus on DIRECT RISKS TO BABY:
 
 CATEGORY GUIDELINES:
 
-FOOD/FISH: Focus on MERCURY LEVELS for fish. Low-mercury fish (salmon, shrimp, eel) are SAFE. High-mercury fish need limits.
+FISH/SEAFOOD - Be specific about mercury and servings:
+- ONE SERVING = 4 oz (113g), about the size of a deck of cards or palm of your hand
+- FDA recommends 8-12 oz (2-3 servings) of LOW-MERCURY fish per week during pregnancy for omega-3 benefits
+- MERCURY LEVELS (PPM = parts per million):
+  - LOW (<0.1 ppm): Salmon, shrimp, tilapia, cod, sardines - SAFE, eat 2-3x/week
+  - MODERATE (0.1-0.3 ppm): Yellowtail/hamachi, mahi-mahi, snapper, halibut - CAUTION, limit to 1 serving/week
+  - HIGH (0.3-0.5 ppm): Tuna (albacore), grouper, sea bass - CAUTION, limit to 6 oz/week
+  - VERY HIGH (>0.5 ppm): Shark, swordfish, king mackerel, tilefish, bigeye tuna - AVOID
+- Always mention the specific mercury level category and weekly serving limit
+- Mercury crosses the placenta and can affect fetal brain development
 
 ACTIVITIES (hot springs, hot tubs, saunas, baths, exercise):
 - The concern is RAISING CORE BODY TEMPERATURE above 101°F/38.3°C, especially in first trimester
@@ -41,7 +50,13 @@ When analyzing product labels/ingredients, identify ANY concerning ingredients a
 RESPONSE FORMAT - ONLY valid JSON, no markdown:
 
 For SINGLE items (one food, activity, or medication):
-{"item":"Name of food/activity/medication","safetyLevel":"safe|caution|avoid","summary":"Brief explanation under 20 words","sources":["https://example.com/source1"]}
+{"item":"Name of food/activity/medication","safetyLevel":"safe|caution|avoid","summary":"Clear explanation with specific guidance (serving sizes, limits, why it matters). 2-3 sentences max.","sources":["https://example.com/source1"]}
+
+For FISH specifically, the summary MUST include:
+- Mercury level category (low/moderate/high)
+- Specific weekly limit (e.g., "1 serving per week" or "2-3 servings per week")
+- What one serving means (4 oz / size of palm)
+- Why mercury matters for pregnancy (brief)
 
 For MENUS, INGREDIENT LISTS, or IMAGES with multiple items - ALWAYS use this format to show a breakdown of each item:
 {"menuAnalysis":true,"analysisType":"menu|ingredients|product","items":[{"item":"Name","safetyLevel":"safe|caution|avoid","summary":"Brief explanation"}],"overallAdvice":"Brief tip","sources":["https://..."]}
