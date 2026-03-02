@@ -100,7 +100,20 @@ export default async function handler(req, res) {
       return 0
     })
 
-    return res.status(200).json({ recalls: finalUnique.slice(0, 30), source: 'rss-multi' })
+    // Count sources for debugging
+    const sourceCounts = {}
+    finalUnique.forEach(r => {
+      sourceCounts[r.source] = (sourceCounts[r.source] || 0) + 1
+    })
+
+    return res.status(200).json({
+      recalls: finalUnique.slice(0, 30),
+      source: 'rss-multi',
+      debug: {
+        totalBeforeSlice: finalUnique.length,
+        sourceCounts
+      }
+    })
   } catch (error) {
     console.error('FDA RSS error:', error)
     return res.status(500).json({
