@@ -75,6 +75,14 @@ export default async function handler(req, res) {
       console.error('Scraping failed:', e.message)
     }
 
+    // Also fetch from FDA Enforcement Reports API (official recall database)
+    try {
+      const enforcementRecalls = await fetchFdaEnforcementReports()
+      enforcementRecalls.forEach(r => unique.push(r))
+    } catch (e) {
+      console.error('Enforcement API failed:', e.message)
+    }
+
     // Deduplicate again after adding scraped results
     const finalUnique = unique.filter((recall, index, self) =>
       index === self.findIndex(r => {
@@ -163,7 +171,17 @@ function parseRssFeed(xmlText) {
       fullText.includes('vegetable') ||
       fullText.includes('fruit') ||
       fullText.includes('lettuce') ||
-      fullText.includes('spinach')
+      fullText.includes('spinach') ||
+      fullText.includes('berries') ||
+      fullText.includes('blueberr') ||
+      fullText.includes('strawberr') ||
+      fullText.includes('raspberr') ||
+      fullText.includes('blackberr') ||
+      fullText.includes('frozen') ||
+      fullText.includes('juice') ||
+      fullText.includes('baby food') ||
+      fullText.includes('infant') ||
+      fullText.includes('formula')
 
     if (title && isRelevant) {
       // Determine contaminant from text
@@ -402,6 +420,95 @@ async function scrapefdaRecallsPage() {
     return recalls.slice(0, 20)
   } catch (error) {
     console.error('Scraping error:', error)
+    return []
+  }
+}
+
+// Fetch from FDA Enforcement Reports API (official recall database)
+async function fetchFdaEnforcementReports() {
+  try {
+    // Get recent food recalls from FDA's openFDA API
+    // This is the official database and catches recalls that might not be in RSS feeds
+    // Date format for openFDA is YYYYMMDD
+    const now = new Date()
+    const past = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
+    const dateFrom = past.toISOString().slice(0, 10).replace(/-/g, '')
+    const dateTo = now.toISOString().slice(0, 10).replace(/-/g, '')
+
+    const url = `https://api.fda.gov/food/enforcement.json?search=report_date:[${dateFrom}+TO+${dateTo}]&sort=report_date:desc&limit=30`
+    console.log('Fetching FDA Enforcement:', url)
+
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'PregnancySafe-App/1.0 (Food Safety Monitor)'
+      }
+    })
+
+    if (!response.ok) {
+      console.error('FDA Enforcement API error:', response.status)
+      return []
+    }
+
+    const data = await response.json()
+    const recalls = []
+
+    if (data.results) {
+      for (const result of data.results) {
+        // Determine contaminant from reason_for_recall
+        const reason = (result.reason_for_recall || '').toLowerCase()
+        let contaminant = 'Unknown'
+        if (reason.includes('listeria')) contaminant = 'Listeria'
+        else if (reason.includes('salmonella')) contaminant = 'Salmonella'
+        else if (reason.includes('e. coli') || reason.includes('e.coli')) contaminant = 'E. coli'
+        else if (reason.includes('undeclared')) contaminant = 'Undeclared Allergen'
+        else if (reason.includes('foreign')) contaminant = 'Foreign Material'
+
+        // Determine pregnancy risk
+        let pregnancyRisk = 'moderate'
+        if (contaminant === 'Listeria') pregnancyRisk = 'high'
+
+        // Determine status from classification
+        let status = 'Announced'
+        if (result.classification === 'Class I') status = 'Class I - Serious'
+        else if (result.classification === 'Class II') status = 'Class II'
+        else if (result.classification === 'Class III') status = 'Class III'
+        if (result.status === 'Ongoing') status = 'Ongoing'
+        if (result.status === 'Terminated') status = 'Closed'
+
+        // Format the date
+        let date = 'Recent'
+        let rawDate = new Date().toISOString()
+        if (result.report_date) {
+          const d = result.report_date
+          date = `${d.substring(4,6)}/${d.substring(6,8)}/${d.substring(0,4)}`
+          rawDate = `${d.substring(0,4)}-${d.substring(4,6)}-${d.substring(6,8)}`
+        }
+
+        const title = result.product_description || result.recalling_firm || 'Unknown Product'
+
+        recalls.push({
+          id: 'enf-' + (result.recall_number || Buffer.from(title).toString('base64').substring(0, 15)),
+          title: title.length > 100 ? title.substring(0, 100) + '...' : title,
+          product: result.product_description || '',
+          brand: result.recalling_firm || '',
+          description: result.reason_for_recall || '',
+          link: `https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfres/res.cfm?id=${result.recall_number || ''}`,
+          date,
+          rawDate,
+          contaminant,
+          pregnancyRisk,
+          status,
+          classification: result.classification,
+          distribution: result.distribution_pattern,
+          source: 'FDA Enforcement'
+        })
+      }
+    }
+
+    console.log(`Fetched ${recalls.length} recalls from FDA Enforcement API`)
+    return recalls
+  } catch (error) {
+    console.error('FDA Enforcement API error:', error)
     return []
   }
 }
