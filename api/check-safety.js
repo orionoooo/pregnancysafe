@@ -40,6 +40,16 @@ ACTIVITIES (hot springs, hot tubs, saunas, baths, exercise):
 
 MEDICATIONS: Always recommend consulting doctor. Note common guidance (e.g., Tylenol generally OK, avoid ibuprofen).
 
+TEAS AND HERBAL BEVERAGES - Be accurate about caffeine content:
+- CAFFEINATED teas (from Camellia sinensis plant): Black tea, green tea, white tea, oolong - contain caffeine, limit to 200mg/day total
+- CAFFEINE-FREE herbal teas (tisanes - NOT from tea plant):
+  - SAFE: Ginger tea, peppermint tea, rooibos, lemon balm - naturally caffeine-free
+  - CAUTION: Hibiscus tea - caffeine-free BUT may affect estrogen levels; limit to 1-2 cups/day
+  - CAUTION: Chamomile - generally safe in moderation, but high amounts may cause uterine contractions
+  - AVOID: Licorice root tea (may affect fetal brain development), dong quai, blue/black cohosh, pennyroyal
+- IMPORTANT: Do NOT mention caffeine for naturally caffeine-free herbal teas like hibiscus, rooibos, peppermint, ginger
+- For herbal teas, focus on the ACTUAL concerns (if any) for that specific herb
+
 SKINCARE/BEAUTY PRODUCTS - Ingredients to flag:
 - AVOID: Retinoids (retinol, tretinoin, adapalene, tazarotene), hydroquinone, high-dose salicylic acid (>2%), phthalates, formaldehyde, chemical sunscreens (oxybenzone, avobenzone), parabens in high amounts
 - CAUTION: Benzoyl peroxide (limit use), essential oils (some unsafe), vitamin A derivatives
